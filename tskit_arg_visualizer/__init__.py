@@ -15,6 +15,7 @@ import tskit
 from IPython.display import HTML, display
 from tqdm.auto import tqdm
 
+
 try:
     from ._version import version as __version__
 except ImportError:
@@ -1478,6 +1479,7 @@ class D3ARG:
             node,   # may want to change this parameter name if it's confusing that it can take multiple nodes.
             width=500,
             height=500,
+            *,
             degree=1,
             y_axis_labels=True,
             y_axis_scale="rank",
