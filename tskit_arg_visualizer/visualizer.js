@@ -1,3 +1,5 @@
+var nan = NaN; // helps in case Python "nan" is templated into the JS code
+
 function ensureRequire() {
     // Needed e.g. in Jupyter notebooks: if require is already available, return resolved promise
     if (typeof require !== 'undefined') {
