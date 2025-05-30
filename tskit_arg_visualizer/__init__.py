@@ -1349,43 +1349,44 @@ class D3ARG:
         )
         draw_D3(arg_json=arg, styles=styles, force_notebook=force_notebook)
 
-    def subset_graph(self, node, degree):
+    def subset_graph(self, seed_nodes, radius):
         """Subsets the graph to focus around a specific node
 
         Parameters
         ----------
-        node : int or list
-            Node ID or list of node IDs that will be central to the subgraph
-        degree : int or list(int, int)
-            Number of degrees above (older than) and below (younger than) the central
-            node to include in the subgraph (default=1). If this is a list, the
-            number of degrees above is taken from the first element and
-            the number of degrees below from the last element.
+        seed_nodes : int or list
+            Node ID or list of node IDs that seed the subgraph
+        radius : int or list(int, int)
+            Path length or distance above (older than) and below (younger than) the seed nodes.
+            Nodes within this number of hops of the seed nodes will also be included in the
+            subgraph (default=1). If this is a list, the first element is taken as the
+            distance above and the last element is taken as the distance below.
 
-        Returns
         -------
-        included_nodes : pd.DataFrame
-            The nodes to be plotted, potentially subset of original graph
-        included_edges : pd.DataFrame
-            The edges to be plotted, potentially subset of original graph
-        included_mutations : pd.DataFrame
-            The mutations to be plotted, potentially subset of original graph
-        included_breakpoints : pd.DataFrame
-            The breakpoints to be plotted, potentially subset of original graph
+        SubgraphData : namedtuple
+            A named tuple containing the following fields:
+            - included_nodes : pd.DataFrame
+                The nodes to be plotted, a subset of the original graph nodes
+            - included_edges : pd.DataFrame  
+                The edges to be plotted, a subset of the original graph edges
+            - included_mutations : pd.DataFrame
+                The mutations to be plotted, a subset of the original graph mutations
+            - included_breakpoints : pd.DataFrame
+                The breakpoints to be plotted, a subset of original graph breakpoints
         """
 
-        if type(node) == int:
-            node = [node]
-        for n in node:
+        if type(seed_nodes) == int:
+            seed_nodes = [seed_nodes]
+        for n in seed_nodes:
             if n not in self.nodes.id.values:
                 raise ValueError(f"Node '{n}' not in the graph.")
 
-        if type(degree) == int:
-            degree = [degree]
-        older_degree = degree[0]
-        younger_degree = degree[-1]
+        if type(radius) == int:
+            radius = [radius]
+        older_radius = radius[0]
+        younger_radius = radius[-1]
 
-        node_set = set(node)
+        node_set = set(seed_nodes)
         first = True
 
         # Inefficient loop, doesn't acknowledge that some edges could be shared
@@ -1396,11 +1397,11 @@ class D3ARG:
             above = {focal}
             below = {focal}
 
-            for od in range(older_degree+1):
+            for od in range(older_radius+1):
                 new_above = set()
                 for n in above:
                     to_add = self.edges.loc[self.edges["target"] == n, :]
-                    if od == older_degree:
+                    if od == older_radius:
                         to_add = to_add.loc[to_add["source"].isin(node_set), :]
                     if first:
                         included_edges = to_add
@@ -1411,11 +1412,11 @@ class D3ARG:
                 above = new_above
                 node_set.update(new_above)
 
-            for yd in range(younger_degree+1):
+            for yd in range(younger_radius+1):
                 new_below = set()
                 for n in below:
                     to_add = self.edges.loc[self.edges["source"] == n, :]
-                    if yd == younger_degree:
+                    if yd == younger_radius:
                         to_add = to_add.loc[to_add["target"].isin(node_set), :]
                     if first:
                         included_edges = to_add
@@ -1476,11 +1477,11 @@ class D3ARG:
 
     def draw_node(
             self,
-            node,   # may want to change this parameter name if it's confusing that it can take multiple nodes.
+            seed_nodes,
             width=500,
             height=500,
+            radius=1,
             *,
-            degree=1,
             y_axis_labels=True,
             y_axis_scale="rank",
             tree_highlighting=True,
@@ -1498,17 +1499,17 @@ class D3ARG:
 
         Parameters
         ----------
-        node : int or list
+        seed_nodes : int or list
             Node ID or list of node IDs that will be central to the subgraph
         width : int
             Width of the force layout graph plot in pixels (default=500)
         height : int
             Height of the force layout graph plot in pixels (default=500)
-        degree : int or list(int, int)
-            Number of degrees above (older than) and below (younger than) the central
-            node to include in the subgraph (default=1). If this is a list, the
-            number of degrees above is taken from the first element and
-            the number of degrees below from the last element.
+        radius : int or list(int, int)
+            Path length or distance above (older than) and below (younger than) the seed nodes.
+            Nodes within this number of hops of the seed nodes will also be included in the
+            subgraph (default=1). If this is a list, the first element is taken as the
+            distance above and the last element is taken as the distance below.
         y_axis_labels : bool, list, or dict
             Whether to include the y-axis on the left of the figure. By default, tick marks will be automatically
             chosen. You can specify a list of tick marks to use instead. You can also set custom text for tick marks
@@ -1550,7 +1551,7 @@ class D3ARG:
                 print("WARNING: `condense_mutations=True` forces `ignore_mutation_times=True`.")
                 ignore_mutation_times = True
 
-        included = self.subset_graph(node=node, degree=degree)
+        included = self.subset_graph(seed_nodes=seed_nodes, radius=radius)
         arg = self._prepare_json(
             plot_type="node",
             nodes=included.nodes,
