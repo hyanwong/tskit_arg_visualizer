@@ -209,7 +209,6 @@ function main_visualizer(
                 });
                 src = JSON.parse(source);
                 src.data.nodes = graph.nodes;
-                console.log(graph.nodes);
                 var textBlob = new Blob([JSON.stringify(src)], {type: "text/plain"});
                 saveAs(textBlob, filename_for_saving + ".json");
             });
