@@ -209,6 +209,7 @@ function main_visualizer(
                 });
                 src = JSON.parse(source);
                 src.data.nodes = graph.nodes;
+                console.log(graph.nodes);
                 var textBlob = new Blob([JSON.stringify(src)], {type: "text/plain"});
                 saveAs(textBlob, filename_for_saving + ".json");
             });
@@ -248,7 +249,7 @@ function main_visualizer(
                 if (!event.active) simulation.alphaTarget(0.3).restart();       
                 var order = d3.selectAll(div_selector + " .sample").data().sort((a, b) => d3.ascending(a.x, b.x)).map(a => a.id);;
                 d3.selectAll(div_selector + " .node").classed("unfix", function(d) {
-                    if ((d.ts_flags & NODE_IS_SAMPLE) && (d.x_pos_reference == -1)) {
+                    if ((d.ts_flags != NODE_IS_SAMPLE) && (d.x_pos_reference == -1)) {
                         delete d.fx;
                     } else {
                         d.fx = evenly_distributed_positions[order.indexOf(d.id)];

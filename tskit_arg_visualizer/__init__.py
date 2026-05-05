@@ -244,8 +244,8 @@ def extract_x_positions_from_json(arg_json):
     width = arg_json["width"]
     x_shift = 50
     if arg_json["y_axis"]["include_labels"]:
-        x_shift = 100
-        width -= 50
+        x_shift = 150
+        width -= 100
     x_pos_01 = {node["id"]: (node["x"] - x_shift) / (width-100) for node in arg_json["data"]["nodes"]}
     return x_pos_01
 
