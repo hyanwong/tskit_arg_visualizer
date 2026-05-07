@@ -1248,12 +1248,15 @@ function main_visualizer(
     can be used to pass in the appropriate data
 */
 
-ensureRequire()
-    .then(require => {
-        require.config({ paths: {d3: 'https://d3js.org/d3.v7.min'}});
-        require(["d3"], function(d3) {
-            main_visualizer(d3, $divnum, $data, $width, $height, $y_axis, $edges, $condense_mutations, $label_mutations, $tree_highlighting, "$title", $rotate_tip_labels, "$plot_type", "$source")
-        });
-    })
-    .catch(err => console.error('Failed to load require.js:', err));
-
+if (typeof window.d3 !== "undefined") {
+    main_visualizer(window.d3, $divnum, $data, $width, $height, $y_axis, $edges, $condense_mutations, $label_mutations, $tree_highlighting, "$title", $rotate_tip_labels, "$plot_type", "$source")
+} else {
+    ensureRequire()
+        .then(require => {
+            require.config({ paths: {d3: $d3_url_json}});
+            require(["d3"], function(d3) {
+                main_visualizer(d3, $divnum, $data, $width, $height, $y_axis, $edges, $condense_mutations, $label_mutations, $tree_highlighting, "$title", $rotate_tip_labels, "$plot_type", "$source")
+            });
+        })
+        .catch(err => console.error('Failed to load require.js:', err));
+}
