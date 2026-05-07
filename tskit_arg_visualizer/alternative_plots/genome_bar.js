@@ -14,12 +14,16 @@ function ensureRequire() {
     });
 };
 
-ensureRequire()
-    .then(require => {
-        require.config({ paths: {d3: 'https://d3js.org/d3.v7.min'}});
-        require(["d3"], draw_genome_bar);
-    })
-    .catch(err => console.error('Failed to load require.js:', err));
+if ($d3_url === null) {
+    draw_genome_bar(d3);
+} else {
+    ensureRequire()
+        .then(require => {
+            require.config({ paths: {d3: $d3_url}});
+            require(["d3"], draw_genome_bar);
+        })
+        .catch(err => console.error('Failed to load require.js:', err));
+}
 
 
 function draw_genome_bar(d3) {
@@ -135,5 +139,3 @@ function draw_genome_bar(d3) {
         })
         .text(function(d) { return d.site_id; });
 }
-
-draw_genome_bar()
