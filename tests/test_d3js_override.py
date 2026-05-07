@@ -85,6 +85,13 @@ class TestD3JsOverride(unittest.TestCase):
         html = self._displayed_html(display_mock.call_args)
         self.assertIn("<script>window.d3 = {};</script>", html)
 
+    def test_draw_genome_bar_default_uses_default_url(self):
+        d3arg = self._minimal_d3arg()
+        with mock.patch.object(tskit_arg_visualizer, "display") as display_mock:
+            d3arg.draw_genome_bar(force_notebook=True)
+        html = self._displayed_html(display_mock.call_args)
+        self.assertIn("https://d3js.org/d3.v7.min", html)
+
 
 if __name__ == "__main__":
     unittest.main()
