@@ -15,3 +15,43 @@ A method for drawing ancestral recombination graphs from tskit tree sequences in
 Users can click and drag the nodes (including the sample) along the x-axis to further clean up the layout of the graph. The simulation does not take into account line crosses, which can often be improved with some fiddling. Once a node has been moved by a user, its position is fixed with regards to the force simulation.
 
 See [tutorial.md](https://github.com/kitchensjn/tskit_arg_visualizer/blob/main/docs/tutorial.md) for a walkthrough of the package.
+
+## Testing (Local and CI)
+
+This repository now includes:
+
+- Python tests (pytest), under `tests/`
+- Minimal browser smoke tests (Playwright), under `tests/playwright/`
+
+### Local setup
+
+1. Install Python dependencies and test runner:
+
+```bash
+python -m pip install --upgrade pip
+pip install -e .
+pip install pytest
+```
+
+2. Install Playwright tooling:
+
+```bash
+npm install
+npx playwright install --with-deps chromium
+```
+
+3. Run tests:
+
+```bash
+python -m pytest tests/ -q
+npm run test:e2e
+```
+
+### GitHub Actions
+
+CI is defined in `.github/workflows/ci.yml` and runs both:
+
+- `python -m pytest tests/ -q`
+- `npm run test:e2e`
+
+If commands change locally, update them in both this README and the workflow file so local and CI behavior stay aligned.

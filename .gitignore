@@ -1,3 +1,5 @@
+node_modules/
+test-results/
 .ipynb_checkpoints
 legacy_code/
 .DS_Store
